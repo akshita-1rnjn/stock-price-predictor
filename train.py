@@ -1,24 +1,25 @@
-# Stock Price Predictor
+import pandas as pd
+import numpy as np
+import yfinance as yf
+from sklearn.linear_model import LinearRegression
 
-## Objective
-Predict stock prices using historical stock market data.
+# Download stock data
+data = yf.download("AAPL", start="2020-01-01", end="2025-01-01")
 
-## Technologies Used
-- Python
-- Pandas
-- NumPy
-- Scikit-Learn
-- Yahoo Finance API
+# Create prediction column
+data['Prediction'] = data['Close'].shift(-1)
 
-## Algorithm
-Linear Regression
+# Features and target
+X = np.array(data['Close']).reshape(-1, 1)[:-1]
+y = np.array(data['Prediction'])[:-1]
 
-## Features
-- Downloads historical stock data
-- Trains a machine learning model
-- Predicts future stock prices
+# Train model
+model = LinearRegression()
+model.fit(X, y)
 
-## Future Improvements
-- LSTM Deep Learning Model
-- Real-time Stock Prediction
-- Web Dashboard
+# Predict next day price
+latest_price = np.array([[data['Close'].iloc[-1]]])
+prediction = model.predict(latest_price)
+
+print("Latest Close Price:", latest_price[0][0])
+print("Predicted Next Day Price:", prediction[0])
